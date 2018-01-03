@@ -28,6 +28,8 @@ byte prevNeighborData = 0;
 byte neighborFace = 0;
 byte prevNeighborFace = 0;
 
+byte brightness = 0;
+
 bool bClockwise = false;
 
 float angularVelocity = 0.0;
@@ -39,6 +41,9 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+
+  // dim our brightness every loop
+  decreaseBrightness(3);
 
   // send a unique number on each side
   for (int i = 0; i < 6; i++) {
@@ -56,10 +61,12 @@ void loop() {
       if (prevNeighborData % 6 == (6 + neighborData - 1) % 6) {
         // clockwise
         bClockwise = true;
+        increaseBrightness(20);
       }
       else if (prevNeighborData % 6 == (neighborData + 1) % 6) {
         // counter clockwise
         bClockwise = false;
+        increaseBrightness(20);
       }
 
       // set ourselves up for next loop (stygmergy)
@@ -69,13 +76,39 @@ void loop() {
   }
 
   // display our status
-  if (bClockwise) {
-    setColor(GREEN);
-  }
-  else {
-    setColor(RED);
+  if (brightness >= 200) {
+    // flash colors when getting fast
+    setColor(makeColorHSB(millis() % 255, 255, brightness));
+  } else {
+    // glow brighter when moving faster
+    setColor(makeColorHSB(0, 255, brightness));
   }
 
+  //  if (bClockwise) {
+  //    setColor(GREEN);
+  //  }
+  //  else {
+  //    setColor(RED);
+  //  }
+
   setFaceColor(neighborFace, WHITE);
+}
+
+void decreaseBrightness(int i) {
+  if (brightness > 0 + i) {
+    brightness = (brightness - i) ;
+  }
+  else {
+    brightness = 0;
+  }
+}
+
+void increaseBrightness(int i) {
+  if (brightness < 255 - i) {
+    brightness = (brightness + i) ;
+  }
+  else {
+    brightness = 255;
+  }
 }
 
